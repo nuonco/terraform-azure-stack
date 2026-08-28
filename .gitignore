@@ -1,0 +1,27 @@
+# Local .terraform directories and plugin caches
+**/.terraform/*
+.terraform.lock.hcl
+
+# State files — must never be committed
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Variable files: may contain install IDs, secrets, and credentials
+*.tfvars
+*.tfvars.json
+!examples/**/*.tfvars.example
+
+# CLI config and plan output
+.terraformrc
+terraform.rc
+*.tfplan
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/

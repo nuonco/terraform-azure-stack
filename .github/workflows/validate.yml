@@ -1,0 +1,46 @@
+name: validate
+
+on:
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Every directory with its own terraform config. Keep this in sync when
+        # adding a submodule or example — an unlisted directory is silently
+        # unvalidated, and a listed one that does not exist fails the job.
+        dir:
+          - "."
+          - "modules/network"
+          - "modules/runner"
+          - "examples/minimal"
+          - "examples/byoc"
+          - "examples/disable-runner"
+          - "examples/toggle-roles"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          # Matches required_version in versions.tf.
+          terraform_version: "1.9.8"
+          terraform_wrapper: false
+
+      - name: terraform fmt
+        if: matrix.dir == '.'
+        run: terraform fmt -check -recursive -diff
+
+      - name: terraform init
+        working-directory: ${{ matrix.dir }}
+        run: terraform init -backend=false -input=false
+
+      - name: terraform validate
+        working-directory: ${{ matrix.dir }}
+        run: terraform validate
