@@ -100,6 +100,11 @@ output "install_inputs" {
   description = "Effective customer-facing input values: control-plane values merged with var.inputs overrides, as reported back to Nuon."
 }
 
+output "custom_nested_stacks" {
+  value       = local.custom_stack_outputs
+  description = "Outputs of custom ARM deployments, keyed by stack name."
+}
+
 output "sensitive_input_names" {
   value       = data.stack_config.this.sensitive_input_names
   description = "Names of inputs the app marks sensitive. The install_inputs map itself is not marked sensitive (Terraform maps are all-or-nothing); use this list to handle those values carefully downstream."
