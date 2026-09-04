@@ -55,7 +55,10 @@ The install's location is read from the Nuon control plane; `var.location` overr
   - **Custom identities** – optional app-operation roles, same shape and gating as break-glass roles.
   - **Runner system identity** – always holds Key Vault Secrets User on the vault and AcrPull/AcrPush on the resource group, because secret sync and image sync run as the runner's ambient identity. When the app declares no Azure roles at all, it additionally holds Contributor, RBAC Administrator and AKS RBAC Cluster Admin — the pre-per-operation-identity behaviour.
 - **Secrets** (`secrets.tf`) – Key Vault secrets for auto-generated values (63-char random) and customer-provided values, plus an empty `telemetry-export-config` secret Nuon populates out of band. Underscores in app-config secret names become hyphens, which Key Vault requires.
+- **Custom stacks** (`custom_stacks.tf`) – Applies the control-plane-generated custom ARM template as a subscription-scoped Azure Deployment Stack. Resource-group and subscription-scoped child templates can be mixed, and outputs are reported under `custom_nested_stacks.<name>.outputs`. Managed resources are deleted when Terraform removes the deployment stack.
 - **Phone home** (`phone_home.tf`) – A `stack_phone_home` resource that reports provisioning results and the effective install inputs back to Nuon. Its preconditions are where unknown or missing inputs, secrets, and roles fail the plan.
+
+If `custom_stacks` is empty, the Azure Deployment Stack is a no-op and the rest of the install stack is unchanged.
 
 ## How identities differ from AWS and GCP
 

@@ -48,7 +48,8 @@ locals {
     custom_identity_client_ids      = local.custom_identity_client_ids
     break_glass_identity_client_ids = local.break_glass_identity_client_ids
 
-    install_inputs = local.install_inputs
+    install_inputs       = local.install_inputs
+    custom_nested_stacks = local.custom_stack_outputs
 
     # Reported for parity with the AWS and GCP payloads. ctl-api does not read it
     # for Azure yet (AzureStackOutputs has no RunnerEnabled field), so disabling
@@ -90,6 +91,7 @@ resource "stack_phone_home" "this" {
     azurerm_role_assignment.runner_register,
     azurerm_role_assignment.runner_key_vault,
     azurerm_role_assignment.runner_acr,
+    azapi_resource.custom,
   ]
 
   install_id      = local.nuon_install_id
@@ -136,6 +138,26 @@ resource "stack_phone_home" "this" {
     precondition {
       condition     = length(local.unknown_role_keys) == 0
       error_message = "var.roles contains keys that match no role: ${join(", ", local.unknown_role_keys)}. Valid keys: ${join(", ", local.display_role_keys)}."
+    }
+
+    precondition {
+      condition     = length(local.custom_stacks) == 0 || data.stack_config.this.custom_stacks_template_url != ""
+      error_message = "the app declares custom stacks, but the Nuon control plane did not provide a deployable custom-stacks template."
+    }
+
+    precondition {
+      condition     = length(local.duplicate_custom_stack_names) == 0
+      error_message = "custom stack names must be unique; duplicates: ${join(", ", local.duplicate_custom_stack_names)}."
+    }
+
+    precondition {
+      condition     = length(local.duplicate_custom_stack_input_parameter_names) == 0
+      error_message = "custom stack input parameters must map to unique top-level ARM parameters; duplicates: ${join(", ", local.duplicate_custom_stack_input_parameter_names)}."
+    }
+
+    precondition {
+      condition     = length(local.missing_custom_stack_input_names) == 0
+      error_message = "custom_stacks input_parameters reference inputs the install does not have: ${join(", ", local.missing_custom_stack_input_names)}. Known inputs: ${join(", ", keys(local.install_inputs))}."
     }
   }
 }

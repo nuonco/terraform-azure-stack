@@ -13,11 +13,14 @@ terraform {
       source  = "hashicorp/random"
       version = ">= 3.0"
     }
-    # >= 0.6.0: this module reads data.stack_config.this.azure, which earlier
-    # provider versions do not serve.
+    azapi = {
+      source  = "Azure/azapi"
+      version = ">= 2.0"
+    }
+    # >= 0.7.0 adds custom_stacks to stack_config.
     stack = {
       source  = "nuonco/stack"
-      version = ">= 0.6.0"
+      version = ">= 0.7.0"
     }
   }
 }
