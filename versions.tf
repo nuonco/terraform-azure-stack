@@ -13,15 +13,20 @@ terraform {
       source  = "hashicorp/random"
       version = ">= 3.0"
     }
+    # The vendor's ARM template is fetched by URL; azurerm_subscription_template_deployment
+    # only takes inline content.
+    http = {
+      source  = "hashicorp/http"
+      version = ">= 3.0"
+    }
     azapi = {
       source  = "Azure/azapi"
       version = ">= 2.0"
     }
-    # >= 0.8.0: stack_version_id on both the data source and the phone-home
-    # resource, without which a newly generated stack version produces no diff.
+    # >= 0.9.0: vpc_nested_template_url on the azure block of stack_config.
     stack = {
       source  = "nuonco/stack"
-      version = ">= 0.8.0"
+      version = ">= 0.9.0"
     }
   }
 }

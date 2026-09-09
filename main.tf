@@ -41,6 +41,7 @@ data "azurerm_client_config" "current" {}
 
 module "network" {
   source = "./modules/network"
+  count  = local.vpc_nested_template_url != "" ? 0 : 1
 
   prefix              = local.prefix
   resource_group_name = azurerm_resource_group.main.name
@@ -63,7 +64,7 @@ module "runner" {
   tags                = local.tags
 
   vm_size          = local.runner_vm_size
-  runner_subnet_id = module.network.runner_subnet_id
+  runner_subnet_id = local.network.runner_subnet_id
 
   # Attaching the operation identities is what lets the runner authenticate as
   # them; see iam.tf.
