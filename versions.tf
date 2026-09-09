@@ -17,10 +17,11 @@ terraform {
       source  = "Azure/azapi"
       version = ">= 2.0"
     }
-    # >= 0.7.0 adds custom_stacks to stack_config.
+    # >= 0.8.0: stack_version_id on both the data source and the phone-home
+    # resource, without which a newly generated stack version produces no diff.
     stack = {
       source  = "nuonco/stack"
-      version = ">= 0.7.0"
+      version = ">= 0.8.0"
     }
   }
 }

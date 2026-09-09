@@ -98,6 +98,10 @@ resource "stack_phone_home" "this" {
   phone_home_url  = local.phone_home_url
   phone_home_type = "azure"
 
+  # Not part of the report: the authenticated phone-home URL is the same for
+  # every version, so this is what makes a newly generated one show as a diff.
+  stack_version_id = data.stack_config.this.stack_version_id
+
   payload = jsonencode(local.phone_home_payload)
 
   # The effective input values (control plane merged with var.inputs). The API
