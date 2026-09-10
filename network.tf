@@ -36,6 +36,28 @@ locals {
 
   network_template_outputs = try(azapi_resource.network[0].output.outputs, {})
 
+  # Outputs the vendor template declares beyond the fixed contract below. ARM
+  # passes these through as install_stack.outputs.vnet_<snake_case name> and app
+  # configs read them, so dropping them here breaks those templates.
+  network_contract_outputs = toset([
+    "vnetId", "vnetName",
+    "runnerSubnetId", "runnerSubnetName",
+    "publicSubnet1Id", "publicSubnet1Name",
+    "publicSubnet2Id", "publicSubnet2Name",
+    "publicSubnet3Id", "publicSubnet3Name",
+    "privateSubnet1Id", "privateSubnet1Name",
+    "privateSubnet2Id", "privateSubnet2Name",
+    "privateSubnet3Id", "privateSubnet3Name",
+    "publicSubnetIds", "publicSubnetNames",
+    "privateSubnetIds", "privateSubnetNames",
+  ])
+
+  network_passthrough_outputs = {
+    for name, value in local.network_template_outputs :
+    "vnet_${lower(replace(replace(name, "/([a-z0-9])([A-Z])/", "$1_$2"), "/[^A-Za-z0-9]/", "_"))}" => try(tostring(value.value), "")
+    if !contains(local.network_contract_outputs, name)
+  }
+
   network = local.network_from_template ? {
     vnet_id              = try(local.network_template_outputs.vnetId.value, "")
     vnet_name            = try(local.network_template_outputs.vnetName.value, "")

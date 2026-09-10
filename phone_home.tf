@@ -55,7 +55,7 @@ locals {
     # for Azure yet (AzureStackOutputs has no RunnerEnabled field), so disabling
     # the runner is not yet visible to the control plane.
     runner_enabled = var.runner_enabled
-  }, local.secret_ids)
+  }, local.secret_ids, local.network_passthrough_outputs)
 }
 
 # Reported through the stack provider rather than a deploymentScripts resource
