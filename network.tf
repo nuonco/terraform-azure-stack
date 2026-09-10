@@ -2,33 +2,39 @@
 # the subnets and NSGs it adds, so building this module's network instead would
 # leave them missing on the Terraform path. The template is subscription-scoped
 # and creates its own network resource group.
-resource "azurerm_subscription_template_deployment" "network" {
+#
+# azapi rather than azurerm_subscription_template_deployment: that resource pins
+# API version 2020-06-01, which rejects languageVersion 2.0 symbolic resources.
+resource "azapi_resource" "network" {
   count = local.vpc_nested_template_url != "" ? 1 : 0
 
-  name             = "${local.prefix}-network"
-  location         = local.location
-  template_content = data.http.network_template[0].response_body
-  tags             = local.tags
+  type      = "Microsoft.Resources/deployments@2022-09-01"
+  name      = "${local.prefix}-network"
+  parent_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}"
+  location  = local.location
 
-  parameters_content = jsonencode({
-    nuonInstallID = { value = local.nuon_install_id }
-    location      = { value = local.location }
-  })
-}
+  body = {
+    properties = {
+      mode = "Incremental"
+      templateLink = {
+        uri = local.vpc_nested_template_url
+      }
+      parameters = {
+        nuonInstallID = { value = local.nuon_install_id }
+        location      = { value = local.location }
+      }
+    }
+  }
 
-data "http" "network_template" {
-  count = local.vpc_nested_template_url != "" ? 1 : 0
-
-  url = local.vpc_nested_template_url
+  response_export_values = {
+    outputs = "properties.outputs"
+  }
 }
 
 locals {
-  network_from_template = length(azurerm_subscription_template_deployment.network) > 0
+  network_from_template = length(azapi_resource.network) > 0
 
-  network_template_outputs = try(
-    jsondecode(azurerm_subscription_template_deployment.network[0].output_content),
-    {},
-  )
+  network_template_outputs = try(azapi_resource.network[0].output.outputs, {})
 
   network = local.network_from_template ? {
     vnet_id              = try(local.network_template_outputs.vnetId.value, "")

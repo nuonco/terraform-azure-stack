@@ -104,7 +104,7 @@ resource "azapi_resource" "custom" {
 
   depends_on = [
     module.network,
-    azurerm_subscription_template_deployment.network,
+    azapi_resource.network,
     module.runner,
   ]
 }

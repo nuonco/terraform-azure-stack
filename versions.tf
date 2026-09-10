@@ -13,12 +13,6 @@ terraform {
       source  = "hashicorp/random"
       version = ">= 3.0"
     }
-    # The vendor's ARM template is fetched by URL; azurerm_subscription_template_deployment
-    # only takes inline content.
-    http = {
-      source  = "hashicorp/http"
-      version = ">= 3.0"
-    }
     azapi = {
       source  = "Azure/azapi"
       version = ">= 2.0"

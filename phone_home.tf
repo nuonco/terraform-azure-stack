@@ -73,7 +73,7 @@ locals {
 resource "stack_phone_home" "this" {
   depends_on = [
     module.network,
-    azurerm_subscription_template_deployment.network,
+    azapi_resource.network,
     module.runner,
     azurerm_key_vault_secret.auto_generate,
     azurerm_key_vault_secret.customer,
