@@ -41,6 +41,8 @@ locals {
   # Caller override wins, then the control plane.
   location = var.location != "" ? var.location : data.stack_config.this.azure.location
 
+  vpc_nested_template_url = data.stack_config.this.azure.vpc_nested_template_url
+
   # <install-id>-rg is what every other Nuon install path uses, and what the
   # control plane resolves the Key Vault, runner, and phone-home against.
   resource_group_name = var.resource_group_name != "" ? var.resource_group_name : "${local.nuon_install_id}-rg"

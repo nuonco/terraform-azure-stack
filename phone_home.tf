@@ -29,13 +29,13 @@ locals {
     subscription_id        = data.azurerm_client_config.current.subscription_id
     subscription_tenant_id = data.azurerm_client_config.current.tenant_id
 
-    network_id   = module.network.vnet_id
-    network_name = module.network.vnet_name
+    network_id   = local.network.vnet_id
+    network_name = local.network.vnet_name
 
-    public_subnet_ids    = join(",", module.network.public_subnet_ids)
-    public_subnet_names  = join(",", module.network.public_subnet_names)
-    private_subnet_ids   = join(",", module.network.private_subnet_ids)
-    private_subnet_names = join(",", module.network.private_subnet_names)
+    public_subnet_ids    = join(",", local.network.public_subnet_ids)
+    public_subnet_names  = join(",", local.network.public_subnet_names)
+    private_subnet_ids   = join(",", local.network.private_subnet_ids)
+    private_subnet_names = join(",", local.network.private_subnet_names)
 
     key_vault_id   = azurerm_key_vault.main.id
     key_vault_name = azurerm_key_vault.main.name
@@ -55,7 +55,7 @@ locals {
     # for Azure yet (AzureStackOutputs has no RunnerEnabled field), so disabling
     # the runner is not yet visible to the control plane.
     runner_enabled = var.runner_enabled
-  }, local.secret_ids)
+  }, local.secret_ids, local.network_passthrough_outputs)
 }
 
 # Reported through the stack provider rather than a deploymentScripts resource
@@ -73,6 +73,7 @@ locals {
 resource "stack_phone_home" "this" {
   depends_on = [
     module.network,
+    azapi_resource.network,
     module.runner,
     azurerm_key_vault_secret.auto_generate,
     azurerm_key_vault_secret.customer,

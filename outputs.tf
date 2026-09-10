@@ -22,35 +22,35 @@ output "subscription_tenant_id" {
 }
 
 output "network_id" {
-  value = module.network.vnet_id
+  value = local.network.vnet_id
 }
 
 output "network_name" {
-  value = module.network.vnet_name
+  value = local.network.vnet_name
 }
 
 output "public_subnet_ids" {
-  value = module.network.public_subnet_ids
+  value = local.network.public_subnet_ids
 }
 
 output "public_subnet_names" {
-  value = module.network.public_subnet_names
+  value = local.network.public_subnet_names
 }
 
 output "private_subnet_ids" {
-  value = module.network.private_subnet_ids
+  value = local.network.private_subnet_ids
 }
 
 output "private_subnet_names" {
-  value = module.network.private_subnet_names
+  value = local.network.private_subnet_names
 }
 
 output "runner_subnet_id" {
-  value = module.network.runner_subnet_id
+  value = local.network.runner_subnet_id
 }
 
 output "runner_subnet_name" {
-  value = module.network.runner_subnet_name
+  value = local.network.runner_subnet_name
 }
 
 output "key_vault_id" {

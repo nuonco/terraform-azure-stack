@@ -67,26 +67,26 @@ resource "azapi_resource" "custom" {
       parameters = merge({
         nuonResourceGroupName = { value = azurerm_resource_group.main.name }
         location              = { value = local.location }
-        vnetId                = { value = module.network.vnet_id }
-        vnetName              = { value = module.network.vnet_name }
-        runnerSubnetId        = { value = module.network.runner_subnet_id }
-        runnerSubnetName      = { value = module.network.runner_subnet_name }
-        publicSubnet1Id       = { value = try(module.network.public_subnet_ids[0], "") }
-        publicSubnet1Name     = { value = try(module.network.public_subnet_names[0], "") }
-        publicSubnet2Id       = { value = try(module.network.public_subnet_ids[1], "") }
-        publicSubnet2Name     = { value = try(module.network.public_subnet_names[1], "") }
-        publicSubnet3Id       = { value = try(module.network.public_subnet_ids[2], "") }
-        publicSubnet3Name     = { value = try(module.network.public_subnet_names[2], "") }
-        privateSubnet1Id      = { value = try(module.network.private_subnet_ids[0], "") }
-        privateSubnet1Name    = { value = try(module.network.private_subnet_names[0], "") }
-        privateSubnet2Id      = { value = try(module.network.private_subnet_ids[1], "") }
-        privateSubnet2Name    = { value = try(module.network.private_subnet_names[1], "") }
-        privateSubnet3Id      = { value = try(module.network.private_subnet_ids[2], "") }
-        privateSubnet3Name    = { value = try(module.network.private_subnet_names[2], "") }
-        publicSubnetIds       = { value = join(",", module.network.public_subnet_ids) }
-        publicSubnetNames     = { value = join(",", module.network.public_subnet_names) }
-        privateSubnetIds      = { value = join(",", module.network.private_subnet_ids) }
-        privateSubnetNames    = { value = join(",", module.network.private_subnet_names) }
+        vnetId                = { value = local.network.vnet_id }
+        vnetName              = { value = local.network.vnet_name }
+        runnerSubnetId        = { value = local.network.runner_subnet_id }
+        runnerSubnetName      = { value = local.network.runner_subnet_name }
+        publicSubnet1Id       = { value = try(local.network.public_subnet_ids[0], "") }
+        publicSubnet1Name     = { value = try(local.network.public_subnet_names[0], "") }
+        publicSubnet2Id       = { value = try(local.network.public_subnet_ids[1], "") }
+        publicSubnet2Name     = { value = try(local.network.public_subnet_names[1], "") }
+        publicSubnet3Id       = { value = try(local.network.public_subnet_ids[2], "") }
+        publicSubnet3Name     = { value = try(local.network.public_subnet_names[2], "") }
+        privateSubnet1Id      = { value = try(local.network.private_subnet_ids[0], "") }
+        privateSubnet1Name    = { value = try(local.network.private_subnet_names[0], "") }
+        privateSubnet2Id      = { value = try(local.network.private_subnet_ids[1], "") }
+        privateSubnet2Name    = { value = try(local.network.private_subnet_names[1], "") }
+        privateSubnet3Id      = { value = try(local.network.private_subnet_ids[2], "") }
+        privateSubnet3Name    = { value = try(local.network.private_subnet_names[2], "") }
+        publicSubnetIds       = { value = join(",", local.network.public_subnet_ids) }
+        publicSubnetNames     = { value = join(",", local.network.public_subnet_names) }
+        privateSubnetIds      = { value = join(",", local.network.private_subnet_ids) }
+        privateSubnetNames    = { value = join(",", local.network.private_subnet_names) }
       }, local.custom_stack_input_parameters)
     }
   }
@@ -104,6 +104,7 @@ resource "azapi_resource" "custom" {
 
   depends_on = [
     module.network,
+    azapi_resource.network,
     module.runner,
   ]
 }
