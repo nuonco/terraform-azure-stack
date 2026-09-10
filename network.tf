@@ -54,7 +54,7 @@ locals {
 
   network_passthrough_outputs = {
     for name, value in local.network_template_outputs :
-    "vnet_${lower(replace(replace(name, "/([a-z0-9])([A-Z])/", "$1_$2"), "/[^A-Za-z0-9]/", "_"))}" => try(tostring(value.value), "")
+    "vnet_${lower(replace(replace(name, "/([a-z0-9])([A-Z])/", "$${1}_$${2}"), "/[^A-Za-z0-9]/", "_"))}" => try(tostring(value.value), "")
     if !contains(local.network_contract_outputs, name)
   }
 
