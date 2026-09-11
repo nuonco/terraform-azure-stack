@@ -49,6 +49,7 @@ The install's location is read from the Nuon control plane; `var.location` overr
 - **VNet & subnets** (`modules/network`) – A `10.128.0.0/16` VNet with up to three public subnets, up to three private subnets, and a dedicated runner subnet. Private and runner subnets carry Key Vault and Container Registry service endpoints. Names and CIDRs match the ARM install stack, so a component that resolved a subnet by name there resolves the same one here.
 - **NSGs, route table & NAT** (`modules/network`) – A permissive inbound NSG on the public subnets, an empty NSG on the private and runner subnets (Azure's defaults already allow intra-VNet and outbound, and deny inbound), and a single Standard NAT gateway providing egress for every subnet.
 - **Runner** (`modules/runner`) – A single-instance Linux VM scale set running Ubuntu 22.04 with a 30 GB disk, no public IP, and the Application Health extension on `:9999/livez` driving automatic instance repair. Set `runner_enabled = false` to skip it.
+- **Private telemetry ingress** (`telemetry.tf`) – An internal Standard Load Balancer exposes the runner collector on TCP 4318 by default. Set `enable_telemetry_ingress = false` to opt out.
 - **Identities & RBAC** (`iam.tf`) –
   - **Operation identities** – user-assigned managed identities for **provision**, **maintenance**, and **deprovision**, each created only if the app config grants it something. Each gets a subscription-scoped custom role definition built from its `actions` (always including `*/register/action`, so the provider can register resource providers) plus direct assignments of any built-in roles at resource-group scope.
   - **Break-glass identities** – optional, created from the roles the control plane serves and gated on `enabled`.
@@ -59,6 +60,20 @@ The install's location is read from the Nuon control plane; `var.location` overr
 - **Phone home** (`phone_home.tf`) – A `stack_phone_home` resource that reports provisioning results and the effective install inputs back to Nuon. Its preconditions are where unknown or missing inputs, secrets, and roles fail the plan.
 
 If `custom_stacks` is empty, the Azure Deployment Stack is a no-op and the rest of the install stack is unchanged.
+
+## Private telemetry ingress
+
+Use `module.azure_stack.telemetry_endpoint`, or `{{ .nuon.install_stack.outputs.telemetry_endpoint }}` in Nuon app components, as `OTEL_EXPORTER_OTLP_ENDPOINT` with protocol `http/protobuf`. The private HTTP URL is unauthenticated, stable across runner replacements, and empty when ingress or the runner is disabled. Nuon's install telemetry setting must also be enabled for collection.
+
+Custom networks must allow client traffic on TCP 4318 and probes from `AzureLoadBalancer`; the built-in NSG already allows both. The load balancer uses the actual runner subnet, including for custom VNet templates.
+
+For existing runners, the scale set's `Manual` policy requires upgrading its instances after applying the new backend-pool attachment:
+
+```sh
+az vmss update-instances --resource-group <resource-group> --name <vmss-name> --instance-ids '*'
+```
+
+The same instance upgrade is needed when detaching the pool before Azure can delete it. New instances use the current model automatically; runner repair remains tied to `:9999/livez`, not collector health.
 
 ## How identities differ from AWS and GCP
 

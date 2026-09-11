@@ -54,7 +54,8 @@ locals {
     # Reported for parity with the AWS and GCP payloads. ctl-api does not read it
     # for Azure yet (AzureStackOutputs has no RunnerEnabled field), so disabling
     # the runner is not yet visible to the control plane.
-    runner_enabled = var.runner_enabled
+    runner_enabled     = var.runner_enabled
+    telemetry_endpoint = local.telemetry_endpoint
   }, local.secret_ids, local.network_passthrough_outputs)
 }
 
@@ -75,6 +76,7 @@ resource "stack_phone_home" "this" {
     module.network,
     azapi_resource.network,
     module.runner,
+    azurerm_lb_rule.telemetry,
     azurerm_key_vault_secret.auto_generate,
     azurerm_key_vault_secret.customer,
     azurerm_key_vault_secret.telemetry_export_config,

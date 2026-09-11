@@ -58,13 +58,16 @@ module "runner" {
   source = "./modules/runner"
   count  = var.runner_enabled ? 1 : 0
 
+  depends_on = [azurerm_lb_rule.telemetry]
+
   prefix              = local.prefix
   resource_group_name = azurerm_resource_group.main.name
   location            = local.location
   tags                = local.tags
 
-  vm_size          = local.runner_vm_size
-  runner_subnet_id = local.network.runner_subnet_id
+  vm_size                                = local.runner_vm_size
+  runner_subnet_id                       = local.network.runner_subnet_id
+  load_balancer_backend_address_pool_ids = local.telemetry_ingress_enabled ? [azurerm_lb_backend_address_pool.telemetry[0].id] : []
 
   # Attaching the operation identities is what lets the runner authenticate as
   # them; see iam.tf.

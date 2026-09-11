@@ -29,6 +29,12 @@ variable "runner_subnet_id" {
   description = "Subnet to attach the runner's network interface to."
 }
 
+variable "load_balancer_backend_address_pool_ids" {
+  type        = list(string)
+  default     = []
+  description = "Load balancer backend pools to attach to the runner NIC IP configuration."
+}
+
 variable "user_assigned_identity_ids" {
   type        = list(string)
   default     = []
