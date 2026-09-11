@@ -47,6 +47,12 @@ variable "runner_enabled" {
   description = "Whether to provision the runner module (VM scale set). Set to false to skip the runner and only create networking, identities, and secrets."
 }
 
+variable "enable_telemetry_ingress" {
+  type        = bool
+  default     = true
+  description = "Whether to expose the runner's OTLP HTTP collector on a private internal load balancer. Effective only when runner_enabled is true; this provisions network ingress but does not enable or disable telemetry in the runner runtime."
+}
+
 variable "runner_vm_size" {
   type        = string
   default     = ""
