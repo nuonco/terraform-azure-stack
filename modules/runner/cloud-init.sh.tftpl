@@ -1,5 +1,33 @@
 #!/bin/bash
 
+init_url='${runner_init_script_url}'
+init_checksum='${runner_init_script_checksum}'
+case "$init_url" in
+  *#sha256=*)
+    if [ -z "$init_checksum" ]; then
+      init_checksum="$${init_url##*#sha256=}"
+    fi
+    init_url="$${init_url%%#*}"
+    ;;
+esac
+if [ -n "$init_checksum" ] && [ -n "$init_url" ]; then
+  set -euo pipefail
+  export RUNNER_ID='${runner_id}'
+  export RUNNER_API_URL='${runner_api_url}'
+  export RUNNER_PLATFORM=azure
+  export CONTAINER_IMAGE_URL='${container_image_url}'
+  export CONTAINER_IMAGE_TAG='${container_image_tag}'
+  export AWS_REGION='${location}'
+  tmp="$(mktemp)"
+  if ! curl -fsSL --retry 5 --retry-all-errors --retry-delay 2 --max-time 60 -o "$tmp" "$init_url"; then
+    echo "failed to download runner init script" >&2
+    exit 1
+  fi
+  echo "$init_checksum  $tmp" | sha256sum -c -
+  bash "$tmp"
+  exit
+fi
+
 RUNNER_ID=${runner_id}
 RUNNER_API_URL=${runner_api_url}
 RUNNER_PLATFORM=azure
