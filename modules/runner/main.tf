@@ -6,11 +6,13 @@
 
 locals {
   custom_data = templatefile("${path.module}/cloud-init.sh.tftpl", {
-    runner_id           = var.runner_id
-    runner_api_url      = var.runner_api_url
-    container_image_url = var.container_image_url
-    container_image_tag = var.container_image_tag
-    location            = var.location
+    runner_id                   = var.runner_id
+    runner_api_url              = var.runner_api_url
+    container_image_url         = var.container_image_url
+    container_image_tag         = var.container_image_tag
+    location                    = var.location
+    runner_init_script_url      = var.runner_init_script_url
+    runner_init_script_checksum = var.runner_init_script_checksum
   })
 }
 
