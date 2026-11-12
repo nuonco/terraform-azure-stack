@@ -25,9 +25,9 @@ jobs:
           - "examples/disable-runner"
           - "examples/toggle-roles"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.4.0
 
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v3.1.2
         with:
           # Matches required_version in versions.tf.
           terraform_version: "1.9.8"

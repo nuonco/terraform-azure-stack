@@ -23,7 +23,7 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.4.0
         with:
           # Full history + tags are required to compute the next version.
           fetch-depth: 0
@@ -45,7 +45,7 @@ jobs:
       # exists for the changelog.
       - name: Create GitHub release
         if: steps.tag.outputs.new_tag != ''
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.6.2
         with:
           tag_name: ${{ steps.tag.outputs.new_tag }}
           name: ${{ steps.tag.outputs.new_tag }}
